@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /app
 
 # app is stdlib-only: no pip install needed
-COPY server.py index.html admin.html app.js style.css data.js ./
+COPY app.py server.py index.html admin.html app.js style.css data.js ./
 
 # data/ (SQLite) and uploads/ (photos, music) live on volumes
 RUN mkdir -p data uploads && chown -R 1000:1000 data uploads
