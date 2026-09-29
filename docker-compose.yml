@@ -1,0 +1,16 @@
+services:
+  invite:
+    build: .
+    image: invite:latest
+    container_name: invite
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-0601}
+    # host folders so the database and uploaded files survive rebuilds
+    # and are easy to back up; run as the host user to keep file ownership
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads

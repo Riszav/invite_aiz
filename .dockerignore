@@ -1,0 +1,10 @@
+.git
+.vscode
+.idea
+data
+uploads
+__pycache__
+*.pyc
+Dockerfile
+docker-compose.yml
+.dockerignore
