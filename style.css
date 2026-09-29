@@ -1,0 +1,166 @@
+/* Fonts are served (with CORS) by the original builder's CDN */
+@font-face{font-family:"TildaSans-Light";src:url(https://www.chakyruu24.kg/fonts/tilda/TildaSans-Light.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"TildaSans-Regular";src:url(https://www.chakyruu24.kg/fonts/tilda/TildaSans-Regular.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"KZGoodVibes";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/KZGoodVibes.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"_AsylbekM02Shelley";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/_AsylbekM02Shelley.kz_.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"KZ_RomulC";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/KZ_RomulC.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"KZOptima";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/KZOptima.woff2)format("woff2");font-display:swap}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#1a1a1a;-webkit-font-smoothing:antialiased}
+body.locked{overflow:hidden}
+
+/* ---------- page frame ---------- */
+.page-container{min-height:100vh;display:flex;justify-content:center;background:#1a1a1a}
+.mobile-frame{width:100%;max-width:430px;position:relative;overflow:hidden}
+.page-content{width:100%;overflow-x:hidden;line-height:1.5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+@media (max-width:500px){
+  .page-container{background:#fff;display:block}
+  .mobile-frame{max-width:100%}
+}
+
+.sh-block{position:relative;width:100%;overflow:hidden}
+.sh-component{position:absolute;transform:translate(-50%,-50%);overflow:hidden;isolation:isolate;pointer-events:none}
+.sh-component.visible-overflow{overflow:visible;isolation:auto}
+.sh-component.interactive{pointer-events:auto}
+.sh-component__content{width:100%;height:100%}
+
+.text-content{width:100%;height:100%;min-height:20px;padding:4px;word-break:break-word;white-space:pre-wrap;margin:0;display:flex;align-items:center;justify-content:center}
+.sh-component[data-type="text"]{overflow:visible}
+.img-wrap{width:100%;height:100%;overflow:hidden;position:relative}
+.img-wrap img{width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none}
+.shape{width:100%;height:100%;position:relative}
+
+/* ---------- animations ---------- */
+.anim{opacity:0}
+.anim.run{animation-fill-mode:forwards;animation-timing-function:ease-out}
+.anim.run.fadeIn{animation-name:fadeIn}
+.anim.run.slideInLeft{animation-name:slideInLeft}
+.anim.run.slideInRight{animation-name:slideInRight}
+.anim.run.slideInUp{animation-name:slideInUp}
+.anim.spin{opacity:1;animation:spin linear infinite}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:none}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:none}}
+@keyframes slideInUp{from{opacity:0;transform:translateY(50px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- button ---------- */
+.btn-link{width:100%;height:100%;display:flex;align-items:center;justify-content:center;gap:6px;border:0;cursor:pointer;text-decoration:none;transition:.3s;box-shadow:0 12px 24px rgba(141,12,12,.35)}
+.btn-link:hover{filter:brightness(1.1)}
+
+/* ---------- calendar ---------- */
+.cal{padding:30px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;min-height:300px}
+.cal-month{font-size:24px;letter-spacing:8px;text-align:center;opacity:.9}
+.cal-days{display:flex;align-items:center;justify-content:center;gap:16px;position:relative}
+.cal-heart{position:relative;display:inline-block}
+.cal-heart svg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:0}
+.cal-heart div{position:relative;z-index:1;padding:10px;font-size:48px}
+.cal-time{font-size:24px;letter-spacing:3px;opacity:.75;display:flex;align-items:center;gap:8px;margin-top:-4px}
+.cal-time span:first-child{font-size:18px;opacity:.6}
+.cal-time span:last-child{font-weight:500}
+.cal-year{font-size:64px;letter-spacing:6px;opacity:.95}
+.cal-week{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
+.cal-week div{letter-spacing:6px;text-align:center;padding:4px 15px}
+.cal-week div.active{font-size:20px;padding:8px 30px;border:2px solid currentColor;border-radius:8px}
+
+/* ---------- timer ---------- */
+.timer{padding:20px;text-align:center;min-height:120px;display:flex;flex-direction:column;justify-content:center}
+.timer-title{margin-bottom:16px;line-height:1.3}
+.timer-row{display:flex;justify-content:center;align-items:flex-start;flex-wrap:wrap}
+.timer-unit{text-align:center;min-width:40px;display:flex;flex-direction:column;align-items:center}
+.timer-num{font-weight:bold;line-height:1;display:block}
+.timer-lbl{margin-top:4px}
+
+/* ---------- RSVP form ---------- */
+.form2{padding:20px;width:100%}
+.form2-opts{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.form2-opt{display:flex;align-items:center;gap:12px;padding:16px;min-height:56px;cursor:pointer;border:2px solid rgba(141,12,12,.2);border-radius:24px;transition:.2s;background:transparent}
+.form2-opt.checked{background:rgba(141,12,12,.1);border-color:#8d0c0c}
+.form2-radio{position:relative;width:24px;height:24px;flex-shrink:0;border:2px solid #8d0c0c;border-radius:50%}
+.form2-opt.checked .form2-radio::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:#8d0c0c}
+.form2-opt span{font-family:KZOptima;font-size:16px;color:#3d3833;flex:1;text-align:left}
+.form2-submit{font-family:KZOptima;font-size:14px;padding:14px 24px;min-height:56px;cursor:pointer;background:#8d0c0c;color:#fff;border:0;border-radius:24px;width:100%;text-transform:uppercase;letter-spacing:.5px;box-shadow:0 12px 24px rgba(141,12,12,.35)}
+
+/* ---------- wishes list ---------- */
+.wl-root{width:100vw;max-width:430px;position:relative;left:50%;transform:translateX(-50%);padding:48px 0 56px}
+.wl-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 24px;text-align:center}
+.wl-empty-icon{font-size:36px;margin-bottom:14px;opacity:.25;line-height:1}
+.wl-state-text{font-size:15px;color:#999;margin:0;letter-spacing:.01em}
+.wl-slider{display:flex;gap:20px;padding:8px 24px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth}
+.wl-slider::-webkit-scrollbar{display:none}
+.wl-card{flex-shrink:0;width:300px;padding:28px 24px 20px;border-radius:20px;border:1.5px solid rgba(141,12,12,.15);scroll-snap-align:center;display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.04);transition:transform .4s,box-shadow .4s}
+.wl-card.active{transform:scale(1.02);box-shadow:0 8px 32px rgba(0,0,0,.08)}
+.wl-quote{position:absolute;top:-4px;left:16px;font-size:80px;font-family:Georgia,serif;font-weight:700;line-height:1;opacity:.08;color:#8d0c0c}
+.wl-text{font-size:15px;line-height:1.65;margin:0;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;position:relative;min-height:72px}
+.wl-footer{display:flex;align-items:center;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid rgba(0,0,0,.05)}
+.wl-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;background:#8d0c0c}
+.wl-name{font-size:14px;font-weight:700}
+.wl-date{font-size:11px;color:#aaa}
+.wl-dots{display:flex;justify-content:center;gap:8px;margin-top:24px}
+.wl-dot{width:6px;height:6px;border-radius:50%;border:0;padding:0;background:rgba(141,12,12,.25);cursor:pointer;transition:.35s}
+.wl-dot.active{width:20px;border-radius:3px;background:#8d0c0c}
+.wl-all{display:block;margin:24px auto 0;padding:12px 24px;border-radius:24px;border:0;color:#fff;font-family:inherit;letter-spacing:1px;cursor:pointer}
+
+/* ---------- fixed bottom bar ---------- */
+.fixed-bar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);width:100%;max-width:430px;padding:0 32px;display:none;justify-content:space-between;z-index:5000;pointer-events:none}
+.fixed-bar.show{display:flex}
+.fixed-btn{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:0 22px 0 6px;border:0;border-radius:40px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.fixed-btn .ico{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid #fff}
+.fixed-btn.wish{padding:0 22px}
+.fixed-btn.playing .ico{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal[hidden]{display:none}
+.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.modal-card{position:relative;background:#fff8ed;border-radius:24px;padding:28px 22px 22px;width:100%;max-width:380px;max-height:85vh;overflow:auto;font-family:KZOptima;color:#3d2314;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.modal-card h3{margin:0 0 18px;font-weight:400;font-size:20px;text-align:center}
+.modal-card input,.modal-card textarea{display:block;width:100%;font-family:KZOptima,sans-serif;font-size:16px;line-height:1.4;color:#8d0c0c;border:2px solid #8d0c0c;border-radius:24px;background:#fff;outline:none;margin:0 0 14px;-webkit-appearance:none;appearance:none}
+.modal-card input{height:52px;padding:0 20px;line-height:normal}
+/* KZOptima's vertical metrics make Chromium clip the placeholder; Tilda Sans renders cleanly everywhere */
+.modal-card input,.modal-card textarea{font-family:"TildaSans-Regular",-apple-system,"Segoe UI",Roboto,sans-serif}
+.modal-card textarea{min-height:120px;padding:14px 18px;resize:vertical;border-radius:18px}
+.modal-card input::placeholder,.modal-card textarea::placeholder{color:rgba(141,12,12,.45);opacity:1}
+.modal-card input:focus,.modal-card textarea:focus{box-shadow:0 0 0 4px rgba(141,12,12,.12)}
+.modal-card .primary{width:100%;min-height:52px;border:0;border-radius:24px;background:#8d0c0c;color:#fff;font-family:KZOptima;font-size:14px;text-transform:uppercase;letter-spacing:.5px;cursor:pointer}
+.modal-card .primary:disabled{opacity:.6}
+.modal-close{position:absolute;top:10px;right:14px;background:none;border:0;font-size:26px;color:#8d0c0c;cursor:pointer;line-height:1}
+.modal-msg{text-align:center;font-size:17px;padding:10px 0}
+
+/* ---------- envelope ---------- */
+.envelope-overlay{position:fixed;inset:0;z-index:10000000;overflow:hidden}
+.envelope-overlay.gone{display:none}
+.envelope-bg{position:absolute;inset:0;background:#7c2d3e;transition:opacity 1s}
+.envelope-bg-panels{position:absolute;inset:0;z-index:2}
+.bg-svg,.flap-svg{width:100%;height:100%;display:block}
+.envelope-flap-top,.envelope-flap-bottom{position:absolute;left:0;width:100%;height:50%;z-index:10;transition:transform 5s cubic-bezier(.25,.46,.45,.94)}
+.envelope-flap-top{top:0}
+.envelope-flap-bottom{bottom:0}
+.envelope-content{position:absolute;inset:0;z-index:20}
+.top-section{position:absolute;top:8vh;left:50%;transform:translateX(-50%);text-align:center;width:90%}
+.bottom-section{position:absolute;bottom:8vh;left:50%;transform:translateX(-50%);text-align:center;width:90%}
+.envelope-invitation{font-family:'KZ_Shelley',cursive;font-size:56px;font-style:italic;font-weight:normal;color:#fce7eb;margin:0 0 8px}
+.envelope-title{font-family:'KZ_Romul','Times New Roman',serif;font-size:22px;font-weight:normal;color:#fce7eb;letter-spacing:4px;text-transform:uppercase;margin:0}
+.envelope-bottom-text{font-family:'KZ_Romul',serif;font-size:20px;line-height:1.4;color:#fce7eb;margin:0}
+.envelope-button-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:25;cursor:pointer;transition:transform 5s cubic-bezier(.25,.46,.45,.94)}
+.envelope-button{width:150px;height:199px;position:relative}
+.envelope-button-wrap:not(.slide-up):hover .envelope-button{transform:scale(1.06);transition:transform .3s}
+.envelope-button-wrap:not(.slide-up):active .envelope-button{transform:scale(.95);transition:transform .1s}
+.envelope-button img{width:100%;height:100%;display:block;object-fit:contain;filter:drop-shadow(0 8px 20px rgba(0,0,0,.5))}
+.button-text{position:absolute;top:48%;left:0;width:100%;text-align:center;transform:translateY(-50%);font-family:'KZ_Romul','Times New Roman',serif;font-size:17px;font-weight:bold;letter-spacing:2px;color:rgba(50,25,5,.9);text-transform:uppercase;pointer-events:none;white-space:nowrap}
+.envelope-overlay.open .envelope-flap-top{transform:translateY(-100%)}
+.envelope-overlay.open .envelope-flap-bottom{transform:translateY(100%)}
+.envelope-overlay.open .envelope-button-wrap{transform:translate(-50%,calc(-50% - 52vh))}
+.envelope-overlay.open .envelope-content,
+.envelope-overlay.open .envelope-bg-panels,
+.envelope-overlay.open .envelope-bg{opacity:0;pointer-events:none}
+
+/* ---------- admin live preview ---------- */
+.preview .anim{opacity:1 !important}
+.preview .anim:not(.spin){animation:none !important}
+.preview .page-container{background:#fff}
+.preview-flash{animation:previewFlash 1.4s ease-out}
+@keyframes previewFlash{0%,40%{outline:3px dashed #8d0c0c;outline-offset:4px}100%{outline:3px dashed transparent;outline-offset:4px}}

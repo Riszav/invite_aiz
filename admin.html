@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Админка приглашения</title>
+  <meta name="robots" content="noindex" />
+  <style>
+    @font-face{font-family:"KZGoodVibes";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/KZGoodVibes.woff2)format("woff2");font-display:swap}
+    @font-face{font-family:"TildaSans-Regular";src:url(https://www.chakyruu24.kg/fonts/tilda/TildaSans-Regular.woff2)format("woff2");font-display:swap}
+    :root{--bg:#fff8ed;--card:#fff;--ink:#3d2314;--muted:#8a7a6e;--accent:#8d0c0c;--line:rgba(61,35,20,.1);
+      --yes:#2e7d32;--pair:#8d0c0c;--no:#9e9e9e}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:"TildaSans-Regular",-apple-system,"Segoe UI",Roboto,sans-serif}
+    .wrap{max-width:960px;margin:0 auto;padding:24px 16px 60px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+    h1{font-family:KZGoodVibes,cursive;font-weight:400;font-size:44px;margin:0}
+    .sub{color:var(--muted);font-size:14px;margin-top:2px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{border:1.5px solid var(--accent);background:transparent;color:var(--accent);border-radius:20px;padding:9px 16px;font:inherit;font-size:14px;cursor:pointer;text-decoration:none}
+    .btn.solid{background:var(--accent);color:#fff}
+    .btn:hover{filter:brightness(1.1)}
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+    .stat{background:var(--card);border-radius:18px;padding:16px 18px;box-shadow:0 2px 14px rgba(0,0,0,.04);border-left:4px solid var(--c,var(--accent))}
+    .stat b{display:block;font-size:34px;line-height:1.1}
+    .stat span{color:var(--muted);font-size:13px}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+    .tabs{display:flex;gap:6px;flex-wrap:wrap}
+    .tab{border:0;background:rgba(141,12,12,.08);color:var(--ink);border-radius:16px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer}
+    .tab.active{background:var(--accent);color:#fff}
+    .search{flex:1;min-width:180px;border:1.5px solid var(--line);border-radius:16px;padding:9px 14px;font:inherit;font-size:14px;background:#fff;outline:none}
+    .search:focus{border-color:var(--accent)}
+    section{margin-bottom:34px}
+    h2{font-size:20px;font-weight:600;margin:0 0 12px}
+    .list{background:var(--card);border-radius:18px;box-shadow:0 2px 14px rgba(0,0,0,.04);overflow:hidden}
+    .row{display:grid;grid-template-columns:40px 1fr auto auto 32px;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--line)}
+    .row:first-child{border-top:0}
+    .num{color:var(--muted);font-size:13px}
+    .name{font-size:16px;font-weight:600;word-break:break-word}
+    .badge{font-size:13px;padding:5px 12px;border-radius:14px;white-space:nowrap;color:#fff;background:var(--c)}
+    .date{color:var(--muted);font-size:13px;white-space:nowrap}
+    .del{border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:4px}
+    .del:hover{color:var(--accent)}
+    .empty{padding:36px 16px;text-align:center;color:var(--muted)}
+    .wishes{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+    .wish{background:var(--card);border-radius:18px;padding:18px;box-shadow:0 2px 14px rgba(0,0,0,.04);position:relative}
+    .wish p{margin:0 0 12px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+    .wish .meta{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted)}
+    .wish .meta b{color:var(--ink)}
+    .wish .del{position:absolute;top:8px;right:8px}
+    .views{display:flex;gap:6px;margin-bottom:22px;border-bottom:1px solid var(--line)}
+    .view-tab{border:0;background:none;font:inherit;font-size:16px;padding:10px 14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+    .view-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+    [hidden]{display:none !important}
+    .ed-group{background:var(--card);border-radius:18px;padding:18px;box-shadow:0 2px 14px rgba(0,0,0,.04);margin-bottom:16px}
+    .ed-group h3{margin:0 0 4px;font-size:18px}
+    .ed-group .hint{color:var(--muted);font-size:13px;margin:0 0 14px}
+    .field{display:block;margin-bottom:14px}
+    .field > span{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+    .field input,.field textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:15px;color:var(--ink);background:#fff;outline:none}
+    .field textarea{min-height:70px;resize:vertical;line-height:1.45}
+    .field input:focus,.field textarea:focus{border-color:var(--accent)}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+    .imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+    .img-item{border:1.5px solid var(--line);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px}
+    .img-item .pv{height:140px;border-radius:10px;background:#f3ece2 center/contain no-repeat}
+    .img-item small{color:var(--muted);font-size:12px}
+    .row-btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn.sm{padding:6px 12px;font-size:13px}
+    .savebar{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 30%);padding:18px 0 8px;display:flex;gap:10px;align-items:center;justify-content:flex-end}
+    .savebar .status{color:var(--muted);font-size:14px;margin-right:auto}
+    .savebar .status.dirty{color:var(--accent)}
+    audio{width:100%}
+    .wrap.wide{max-width:1440px}
+    .editor-layout{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:24px;align-items:start}
+    .preview-pane{position:sticky;top:16px;height:calc(100vh - 32px);display:flex;flex-direction:column;align-items:center;gap:10px}
+    .preview-head{width:100%;display:flex;align-items:center;justify-content:space-between;font-size:14px;color:var(--muted)}
+    .phone{flex:1;width:100%;max-width:410px;min-height:0;border-radius:36px;background:#1a1a1a;padding:10px;box-shadow:0 20px 50px rgba(0,0,0,.2);position:relative}
+    .phone iframe{width:100%;height:100%;border:0;border-radius:28px;background:#fff8ed;display:block}
+    .phone .loading{position:absolute;top:18px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font-size:12px;padding:4px 10px;border-radius:10px;opacity:0;transition:opacity .2s;pointer-events:none}
+    .phone.busy .loading{opacity:1}
+    .preview-toggle{display:none}
+    #preview-close{display:none}
+    @media (max-width:1100px){
+      .editor-layout{grid-template-columns:1fr}
+      .preview-pane{display:none;position:fixed;inset:0;top:0;height:100vh;z-index:50;background:rgba(0,0,0,.6);padding:16px;align-items:center}
+      .preview-pane.open{display:flex}
+      #preview-close{display:inline-block}
+      .preview-head{max-width:410px;color:#fff}
+      .preview-toggle{display:inline-block;position:fixed;right:16px;bottom:84px;z-index:40;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+    }
+    @media (max-width:600px){
+      .grid2{grid-template-columns:1fr}
+      h1{font-size:36px}
+      .row{grid-template-columns:28px 1fr 32px;grid-template-areas:"n name del" ". badge badge" ". date date";row-gap:6px}
+      .row .num{grid-area:n}.row .name{grid-area:name}.row .badge{grid-area:badge;justify-self:start}.row .date{grid-area:date}.row .del{grid-area:del}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Админка</h1>
+        <div class="sub">Кыз узатуу · Айзирек · <span id="updated"></span></div>
+      </div>
+      <div class="actions">
+        <a class="btn" href="/" target="_blank">Открыть приглашение</a>
+        <button class="btn solid" id="csv">Скачать CSV</button>
+      </div>
+    </header>
+
+    <nav class="views">
+      <button class="view-tab active" data-view="answers">Ответы гостей</button>
+      <button class="view-tab" data-view="editor">Редактор сайта</button>
+    </nav>
+
+    <div id="view-answers">
+    <div class="stats" id="stats"></div>
+
+    <section>
+      <h2>Опрос (Сурамжылоо)</h2>
+      <div class="toolbar">
+        <div class="tabs" id="tabs"></div>
+        <input class="search" id="search" type="search" placeholder="Поиск по имени…" />
+      </div>
+      <div class="list" id="rsvp"></div>
+    </section>
+
+    <section>
+      <h2>Пожелания (Каалоо-тилектер) · <span id="wcount">0</span></h2>
+      <div class="wishes" id="wishes"></div>
+    </section>
+    </div>
+
+    <div id="view-editor" hidden>
+      <div class="editor-layout">
+        <div>
+          <div id="editor"></div>
+          <div class="savebar">
+            <span class="status" id="ed-status">Изменений нет</span>
+            <button class="btn" id="ed-reset">Отменить изменения</button>
+            <button class="btn solid" id="ed-save">Сохранить</button>
+          </div>
+        </div>
+        <aside class="preview-pane" id="preview-pane">
+          <div class="preview-head">
+            <span>Предпросмотр · несохранённые правки видны сразу</span>
+            <button class="btn sm" id="preview-close" type="button">Закрыть</button>
+          </div>
+          <div class="phone" id="phone">
+            <iframe id="preview" title="Предпросмотр сайта"></iframe>
+            <span class="loading">обновление…</span>
+          </div>
+        </aside>
+      </div>
+      <button class="btn solid preview-toggle" id="preview-open" type="button">Предпросмотр</button>
+    </div>
+  </div>
+
+  <script>
+    // answer values come from the original form: yes / no (= with spouse) / maybe (= can't come)
+    const ANSWERS = {
+      yes:   { label: 'Придёт',             guests: 1, color: 'var(--yes)' },
+      no:    { label: 'Придёт с супругом(ой)', guests: 2, color: 'var(--pair)' },
+      maybe: { label: 'Не сможет прийти',   guests: 0, color: 'var(--no)' }
+    };
+    let rsvp = [], wishes = [], filter = 'all', query = '';
+
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fmt = iso => new Date(iso).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    async function load() {
+      const [r, w] = await Promise.all([fetch('/api/rsvp').then(x => x.json()), fetch('/api/wishes').then(x => x.json())]);
+      rsvp = r.slice().reverse(); wishes = w;
+      $('updated').textContent = 'обновлено ' + new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      render();
+    }
+
+    function render() {
+      const count = k => rsvp.filter(r => r.answer === k).length;
+      const guests = rsvp.reduce((s, r) => s + (ANSWERS[r.answer]?.guests ?? 0), 0);
+      $('stats').innerHTML = [
+        ['Всего гостей придёт', guests, 'var(--accent)'],
+        ['Всего ответов', rsvp.length, 'var(--ink)'],
+        ['Придут одни', count('yes'), 'var(--yes)'],
+        ['С супругом(ой)', count('no'), 'var(--pair)'],
+        ['Не придут', count('maybe'), 'var(--no)']
+      ].map(([t, v, c]) => `<div class="stat" style="--c:${c}"><b>${v}</b><span>${t}</span></div>`).join('');
+
+      $('tabs').innerHTML = [['all', 'Все', rsvp.length], ...Object.entries(ANSWERS).map(([k, a]) => [k, a.label, count(k)])]
+        .map(([k, t, n]) => `<button class="tab ${filter === k ? 'active' : ''}" data-f="${k}">${t} · ${n}</button>`).join('');
+
+      const q = query.toLowerCase();
+      const rows = rsvp.filter(r => (filter === 'all' || r.answer === filter) && r.name.toLowerCase().includes(q));
+      $('rsvp').innerHTML = rows.length ? rows.map((r, i) => {
+        const a = ANSWERS[r.answer] || { label: r.answer_text || r.answer, color: 'var(--muted)' };
+        return `<div class="row"><span class="num">${i + 1}</span><span class="name">${esc(r.name)}</span>
+          <span class="badge" style="--c:${a.color}">${esc(a.label)}</span><span class="date">${fmt(r.created_at)}</span>
+          <button class="del" title="Удалить" data-del="rsvp" data-id="${r.id}">×</button></div>`;
+      }).join('') : '<div class="empty">Пока нет ответов</div>';
+
+      $('wcount').textContent = wishes.length;
+      $('wishes').innerHTML = wishes.length ? wishes.map(w => `<div class="wish">
+          <button class="del" title="Удалить" data-del="wishes" data-id="${w.id}">×</button>
+          <p>${esc(w.text)}</p><div class="meta"><b>${esc(w.name)}</b><span>${fmt(w.created_at)}</span></div></div>`).join('')
+        : '<div class="list"><div class="empty">Пока нет пожеланий</div></div>';
+    }
+
+    $('tabs').addEventListener('click', e => { const f = e.target.dataset.f; if (f) { filter = f; render(); } });
+    $('search').addEventListener('input', e => { query = e.target.value.trim(); render(); });
+    document.addEventListener('click', async e => {
+      const b = e.target.closest('[data-del]');
+      if (!b || !confirm('Удалить эту запись?')) return;
+      await fetch(`/api/${b.dataset.del}?id=${encodeURIComponent(b.dataset.id)}`, { method: 'DELETE' });
+      load();
+    });
+    $('csv').addEventListener('click', () => {
+      const cell = v => `"${String(v).replace(/"/g, '""')}"`;
+      const lines = [['Имя', 'Ответ', 'Кол-во гостей', 'Дата'].map(cell).join(';'),
+        ...rsvp.map(r => [r.name, ANSWERS[r.answer]?.label || r.answer_text, ANSWERS[r.answer]?.guests ?? '', fmt(r.created_at)].map(cell).join(';'))];
+      const blob = new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'otvety-gostei.csv'; a.click();
+    });
+
+    // ---------------- view tabs ----------------
+    document.querySelector('.views').addEventListener('click', e => {
+      const v = e.target.dataset.view;
+      if (!v) return;
+      document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === v));
+      $('view-answers').hidden = v !== 'answers';
+      $('view-editor').hidden = v !== 'editor';
+      document.querySelector('.wrap').classList.toggle('wide', v === 'editor');
+      if (v === 'editor' && !page) loadPage();
+    });
+
+    // ---------------- site editor ----------------
+    let page = null, dirty = false;
+    const comps = () => page.blocks.flatMap(b => b.components);
+    const byType = t => comps().filter(c => c.type === t).sort((a, b) => a.position.y - b.position.y);
+
+    // live preview: iframe renders window.__PREVIEW_DATA (the unsaved `page` object)
+    const frame = $('preview');
+    let previewTimer = null, restoreScroll = 0;
+    function refreshPreview(immediate) {
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(() => {
+        window.__PREVIEW_DATA = page;
+        try { restoreScroll = frame.contentWindow.scrollY || 0; } catch (e) { restoreScroll = 0; }
+        $('phone').classList.add('busy');
+        if (frame.src) frame.contentWindow.location.reload();
+        else frame.src = '/?preview=1';
+      }, immediate ? 0 : 500);
+    }
+    frame.addEventListener('load', () => {
+      $('phone').classList.remove('busy');
+      try { frame.contentWindow.scrollTo(0, restoreScroll); } catch (e) { /* ignore */ }
+    });
+    function focusPreview(id) {
+      try { frame.contentWindow.__previewFocus && frame.contentWindow.__previewFocus(id); } catch (e) { /* ignore */ }
+    }
+    $('preview-open').addEventListener('click', () => $('preview-pane').classList.add('open'));
+    $('preview-close').addEventListener('click', () => $('preview-pane').classList.remove('open'));
+
+    function setDirty(v) {
+      if (v) refreshPreview();
+      dirty = v;
+      $('ed-status').textContent = v ? 'Есть несохранённые изменения' : 'Изменений нет';
+      $('ed-status').classList.toggle('dirty', v);
+    }
+    window.addEventListener('beforeunload', e => { if (dirty) e.preventDefault(); });
+
+    async function loadPage() {
+      page = await fetch('/api/page').then(r => r.json());
+      renderEditor();
+      setDirty(false);
+      refreshPreview(true);
+    }
+
+    function field(label, value, onInput, { multiline = false, type = 'text', target = null } = {}) {
+      const wrap = document.createElement('label');
+      wrap.className = 'field';
+      wrap.innerHTML = `<span>${esc(label)}</span>`;
+      const input = document.createElement(multiline ? 'textarea' : 'input');
+      if (!multiline) input.type = type;
+      input.value = value ?? '';
+      if (multiline) input.rows = Math.min(10, Math.max(2, String(value).split('\n').length + 1));
+      input.addEventListener('input', () => { onInput(input.value); setDirty(true); });
+      if (target) input.addEventListener('focus', () => focusPreview(target));
+      wrap.append(input);
+      return wrap;
+    }
+
+    function group(title, hint, children) {
+      const g = document.createElement('div');
+      g.className = 'ed-group';
+      g.innerHTML = `<h3>${esc(title)}</h3>` + (hint ? `<p class="hint">${esc(hint)}</p>` : '');
+      children.forEach(c => c && g.append(c));
+      return g;
+    }
+
+    function grid(children) {
+      const d = document.createElement('div');
+      d.className = 'grid2';
+      children.forEach(c => d.append(c));
+      return d;
+    }
+
+    async function upload(file) {
+      const ext = (file.name.match(/\.[a-z0-9]+$/i) || [''])[0];
+      const res = await fetch('/api/upload', { method: 'POST', headers: { 'X-Filename': 'file' + ext }, body: file });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error || res.status);
+      return j.url;
+    }
+
+    function uploadButton(label, accept, onUrl) {
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'btn sm'; btn.textContent = label;
+      const inp = document.createElement('input');
+      inp.type = 'file'; inp.accept = accept; inp.hidden = true;
+      btn.onclick = () => inp.click();
+      inp.onchange = async () => {
+        if (!inp.files[0]) return;
+        btn.disabled = true; btn.textContent = 'Загрузка…';
+        try { onUrl(await upload(inp.files[0])); setDirty(true); }
+        catch (e) { alert('Не удалось загрузить: ' + e.message); }
+        btn.disabled = false; btn.textContent = label;
+      };
+      const span = document.createElement('span');
+      span.append(btn, inp);
+      return span;
+    }
+
+    // "2026-11-08T16:00:00" <-> datetime-local value
+    const toLocalInput = s => (s || '').slice(0, 16);
+
+    function renderEditor() {
+      const root = $('editor');
+      root.innerHTML = '';
+      page.envelope = page.envelope || {};
+      const E = page.envelope;
+
+      root.append(group('Конверт и заголовок', 'Первый экран, который гость видит до открытия приглашения.', [
+        field('Заголовок вкладки браузера', page.title, v => page.title = v),
+        grid([
+          field('Надпись сверху', E.invitation, v => E.invitation = v),
+          field('Название события', E.title, v => E.title = v),
+          field('Текст внизу', E.bottomText, v => E.bottomText = v),
+          field('Надпись на печати', E.button, v => E.button = v)
+        ])
+      ]));
+
+      const dated = comps().filter(c => c.data && c.data.event_date);
+      const timer = byType('timer')[0];
+      if (dated.length) {
+        root.append(group('Дата и время события', 'Меняет календарь и таймер обратного отсчёта одновременно.', [
+          field('Дата и время', toLocalInput(dated[0].data.event_date), v => dated.forEach(c => c.data.event_date = v + ':00'), { type: 'datetime-local', target: dated[0].id }),
+          timer ? field('Заголовок таймера', timer.data.event_title, v => timer.data.event_title = v, { target: timer.id }) : null
+        ]));
+      }
+
+      root.append(group('Тексты', 'Все надписи на странице сверху вниз. Переносы строк сохраняются.',
+        byType('text').map((c, i) => field(`Текст ${i + 1}`, c.data.content, v => c.data.content = v, { multiline: true, target: c.id }))));
+
+      const buttons = byType('button');
+      if (buttons.length) root.append(group('Кнопки и ссылки', 'Например, кнопка с картой (2GIS / Google Maps).',
+        buttons.map(c => grid([
+          field('Текст кнопки', c.data.text, v => c.data.text = v, { target: c.id }),
+          field('Ссылка', c.data.url, v => c.data.url = v, { type: 'url', target: c.id })
+        ]))));
+
+      const form = byType('form2')[0];
+      if (form) root.append(group('Опрос', 'Варианты ответа гостей. Статистика в «Ответах» считается по порядку вариантов: 1 — придёт, 2 — с супругом, 3 — не придёт.', [
+        ...form.data.form_buttons.map((b, i) => field(`Вариант ${i + 1}`, b.button_text, v => b.button_text = v, { target: form.id })),
+        grid([
+          field('Кнопка отправки', form.data.submit_button_text, v => form.data.submit_button_text = v, { target: form.id }),
+          field('Заголовок окна с именем', form.data.modal_title, v => form.data.modal_title = v),
+          field('Кнопка в окне', form.data.modal_button_text, v => form.data.modal_button_text = v),
+          field('Подсказка в поле имени', form.data.form_fields[0].placeholder, v => form.data.form_fields[0].placeholder = v)
+        ])
+      ]));
+
+      // images: group identical sources so decorative repeats are replaced together
+      const bySrc = new Map();
+      byType('image').forEach(c => { if (!bySrc.has(c.data.src)) bySrc.set(c.data.src, []); bySrc.get(c.data.src).push(c); });
+      const imgs = document.createElement('div');
+      imgs.className = 'imgs';
+      [...bySrc.entries()].forEach(([src, list], i) => {
+        const item = document.createElement('div');
+        item.className = 'img-item';
+        const pv = document.createElement('div');
+        pv.className = 'pv';
+        pv.style.backgroundImage = `url("${src}")`;
+        const setSrc = url => { list.forEach(c => c.data.src = url); pv.style.backgroundImage = `url("${url}")`; urlField.querySelector('input').value = url; };
+        const urlField = field('Ссылка на картинку', src, v => { list.forEach(c => c.data.src = v); pv.style.backgroundImage = `url("${v}")`; }, { target: list[0].id });
+        pv.style.cursor = 'pointer';
+        pv.title = 'Показать на сайте';
+        pv.addEventListener('click', () => focusPreview(list[0].id));
+        const info = document.createElement('small');
+        info.textContent = `Картинка ${i + 1}` + (list.length > 1 ? ` · используется ${list.length} раза` : '');
+        const btns = document.createElement('div');
+        btns.className = 'row-btns';
+        btns.append(uploadButton('Загрузить новую', 'image/*', setSrc));
+        item.append(pv, info, btns, urlField);
+        imgs.append(item);
+      });
+      root.append(group('Картинки', 'Новая картинка встанет на место старой с тем же размером. Лучше загружать фото примерно тех же пропорций.', [imgs]));
+
+      const audio = byType('audio-fixed')[0];
+      const wishBtn = byType('fixed-wishes')[0];
+      const wishList = byType('wishes-list')[0];
+      if (audio || wishBtn) {
+        const player = document.createElement('audio');
+        player.controls = true;
+        if (audio) player.src = audio.data.audio_url;
+        const urlF = audio && field('Ссылка на музыку (mp3)', audio.data.audio_url, v => { audio.data.audio_url = v; player.src = v; });
+        const up = audio && uploadButton('Загрузить mp3', 'audio/*', url => { audio.data.audio_url = url; player.src = url; urlF.querySelector('input').value = url; });
+        root.append(group('Музыка и нижние кнопки', null, [
+          audio ? player : null,
+          audio ? (() => { const d = document.createElement('div'); d.className = 'row-btns'; d.style.margin = '10px 0 14px'; d.append(up); return d; })() : null,
+          urlF,
+          grid([
+            audio ? field('Кнопка музыки', audio.data.button_text, v => audio.data.button_text = v) : null,
+            wishBtn ? field('Кнопка пожеланий', wishBtn.data.button_text, v => wishBtn.data.button_text = v) : null,
+            wishList ? field('Кнопка «все пожелания»', wishList.data.button_text, v => wishList.data.button_text = v, { target: wishList.id }) : null
+          ].filter(Boolean))
+        ]));
+      }
+    }
+
+    $('ed-save').addEventListener('click', async () => {
+      const btn = $('ed-save');
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/page', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(page) });
+        if (!res.ok) throw new Error(res.status);
+        setDirty(false);
+        $('ed-status').textContent = 'Сохранено ✓ — обновите страницу приглашения';
+      } catch (e) {
+        alert('Не удалось сохранить: ' + e.message);
+      }
+      btn.disabled = false;
+    });
+    $('ed-reset').addEventListener('click', () => { if (!dirty || confirm('Отменить все несохранённые изменения?')) loadPage(); });
+
+    load();
+    setInterval(load, 15000);
+  </script>
+</body>
+</html>

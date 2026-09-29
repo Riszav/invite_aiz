@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Кыз узатуу</title>
+  <meta name="description" content="Кыз узатуу" />
+  <meta property="og:title" content="Кыз узатуу" />
+  <meta property="og:description" content="Кыз узатуу" />
+  <meta property="og:image" content="https://aisoft09.shop/uploads/beyne/og_images/og_image_315e49fb-c907-445a-be69-0d0497ea4669_df9b37d896634da6898ef47db4faadf9.webp" />
+  <meta name="theme-color" content="#141524" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-container">
+    <div class="mobile-frame">
+      <div class="page-content" id="page"></div>
+    </div>
+  </div>
+
+  <!-- Envelope intro -->
+  <div class="envelope-overlay" id="envelope">
+    <div class="envelope-bg"></div>
+    <div class="envelope-bg-panels">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="bg-svg">
+        <polygon points="0,0 0,100 50,50" fill="#7c2d3e"></polygon>
+        <polygon points="100,0 100,100 50,50" fill="#7c2d3e"></polygon>
+        <polygon points="0,0 0,100 50,50" fill="rgba(0,0,0,0.08)"></polygon>
+        <polygon points="100,0 100,100 50,50" fill="rgba(255,255,255,0.03)"></polygon>
+        <line x1="6" y1="0" x2="48" y2="48" stroke="rgba(0,0,0,0.25)" stroke-width="0.4"></line>
+        <line x1="94" y1="0" x2="52" y2="48" stroke="rgba(0,0,0,0.18)" stroke-width="0.4"></line>
+        <line x1="6" y1="100" x2="48" y2="52" stroke="rgba(0,0,0,0.2)" stroke-width="0.4"></line>
+        <line x1="94" y1="100" x2="52" y2="52" stroke="rgba(0,0,0,0.15)" stroke-width="0.4"></line>
+      </svg>
+    </div>
+    <div class="envelope-flap-top">
+      <svg viewBox="0 0 100 50" preserveAspectRatio="none" class="flap-svg">
+        <polygon points="0,0 100,0 50,50" fill="#7c2d3e"></polygon>
+        <polygon points="0,0 100,0 50,50" fill="rgba(255,255,255,0.04)"></polygon>
+      </svg>
+    </div>
+    <div class="envelope-flap-bottom">
+      <svg viewBox="0 0 100 50" preserveAspectRatio="none" class="flap-svg">
+        <polygon points="0,50 100,50 50,0" fill="#7c2d3e"></polygon>
+        <polygon points="0,50 100,50 50,0" fill="rgba(0,0,0,0.04)"></polygon>
+      </svg>
+    </div>
+    <div class="envelope-content">
+      <div class="top-section">
+        <h1 class="envelope-invitation" id="env-invitation">Чакыруу Билети</h1>
+        <h2 class="envelope-title" id="env-title">Кыз узатуу</h2>
+      </div>
+      <div class="bottom-section">
+        <p class="envelope-bottom-text" id="env-bottom">Чакырууну ачуу үчүн «АЧУУ» баскычын басыңыз.</p>
+      </div>
+    </div>
+    <div class="envelope-button-wrap" id="envelope-btn">
+      <div class="envelope-button">
+        <img src="https://www.chakyruu24.kg/convert_btn.png" alt="АЧУУ" />
+        <span class="button-text" id="env-button">АЧУУ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed bottom buttons -->
+  <div class="fixed-bar" id="fixed-bar"></div>
+
+  <!-- Modal root -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" id="modal-card"></div>
+  </div>
+
+  <audio id="bg-audio" loop preload="none"></audio>
+
+  <script src="/page-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
