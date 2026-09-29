@@ -49,7 +49,7 @@ window.PAGE_DATA = {
       "backgroundColor": "#8d0c0c",
       "borderRadius": 90,
       "text": "Картаны ачуу",
-      "url": "https://2gis.com/1Aimt",
+      "url": "https://go.2gis.com/yZy9I",
       "textColor": "#ffffff",
       "borderColor": "#8d0c0c",
       "borderWidth": 0,

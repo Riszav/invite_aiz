@@ -1,0 +1,6 @@
+# guest answers, wishes and edited page content live here — never commit
+data/
+# photos and music uploaded through the admin
+uploads/
+__pycache__/
+*.pyc
