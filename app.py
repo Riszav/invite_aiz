@@ -5,15 +5,19 @@ Answers and wishes are stored in SQLite: data/invite.db (tables rsvp, wishes).
 Old data/rsvp.json and data/wishes.json are imported once on first start.
 Page content (texts, date, images, music) is stored in the `page` table, seeded from
 data.js, served to the site as /page-data.js and editable from /admin.
-Guest responses are viewable at /admin (login: any username, password: ADMIN_PASSWORD).
+Guest responses are viewable at /admin after signing in on /login
+(ADMIN_LOGIN / ADMIN_PASSWORD, default admin / 0601).
 """
 
-import base64
+import hashlib
+import hmac
 import json
 import mimetypes
 import os
 import re
+import secrets
 import sqlite3
+import time
 import uuid
 from datetime import datetime, timezone
 from urllib.parse import parse_qs
@@ -24,7 +28,10 @@ DB_PATH = os.path.join(DATA_DIR, "invite.db")
 UPLOAD_DIR = os.path.join(ROOT, "uploads")
 UPLOAD_TYPES = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".mp3", ".m4a", ".ogg", ".wav"}
 MAX_UPLOAD = 25 * 1024 * 1024
+ADMIN_LOGIN = os.environ.get("ADMIN_LOGIN", "admin")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "0601")
+SESSION_COOKIE = "admin_session"
+SESSION_DAYS = 30
 
 # files of the site itself that may be served; everything else except uploads/ is private
 PUBLIC_FILES = {"index.html", "app.js", "style.css"}
@@ -126,6 +133,18 @@ class Request:
         self.path = environ.get("PATH_INFO", "/") or "/"
         self.query = parse_qs(environ.get("QUERY_STRING", ""))
 
+    def cookie(self, name):
+        for part in self.environ.get("HTTP_COOKIE", "").split(";"):
+            key, _, value = part.strip().partition("=")
+            if key == name:
+                return value
+        return ""
+
+    @property
+    def is_https(self):
+        return (self.environ.get("wsgi.url_scheme") == "https"
+                or self.header("X-Forwarded-Proto").lower() == "https")
+
     def header(self, name, default=""):
         return self.environ.get("HTTP_" + name.upper().replace("-", "_"), default)
 
@@ -150,30 +169,56 @@ def response(status, body=b"", content_type="text/plain; charset=utf-8", headers
     return status, hdrs, body
 
 
-def json_response(obj, status="200 OK"):
-    return response(status, json.dumps(obj, ensure_ascii=False), "application/json; charset=utf-8")
+def json_response(obj, status="200 OK", headers=()):
+    return response(status, json.dumps(obj, ensure_ascii=False), "application/json; charset=utf-8", headers)
 
 
 NOT_FOUND = ("404 Not Found", [("Content-Type", "text/plain"), ("Content-Length", "9")], b"Not found")
 
 
+# ---------------- admin session (signed cookie, no server-side state) ----------------
+
+def secret_key():
+    """SECRET_KEY env var, else a random key kept in data/ so sessions survive restarts."""
+    if os.environ.get("SECRET_KEY"):
+        return os.environ["SECRET_KEY"].encode()
+    path = os.path.join(DATA_DIR, "secret.key")
+    if not os.path.exists(path):
+        os.makedirs(DATA_DIR, exist_ok=True)
+        with open(path, "w") as f:
+            f.write(secrets.token_hex(32))
+    with open(path) as f:
+        return f.read().strip().encode()
+
+
+def sign(value):
+    # the credentials take part in the signature: changing login/password logs everyone out
+    key = secret_key() + ADMIN_LOGIN.encode() + b"\0" + ADMIN_PASSWORD.encode()
+    return hmac.new(key, value.encode(), hashlib.sha256).hexdigest()
+
+
+def make_session():
+    expires = str(int(time.time()) + SESSION_DAYS * 86400)
+    return expires + "." + sign(expires)
+
+
 def is_admin(req):
-    if not ADMIN_PASSWORD:
-        return True
-    auth = req.header("Authorization")
-    if auth.startswith("Basic "):
-        try:
-            _, _, pwd = base64.b64decode(auth[6:]).decode().partition(":")
-            if pwd == ADMIN_PASSWORD:
-                return True
-        except ValueError:
-            pass
-    return False
+    expires, _, signature = req.cookie(SESSION_COOKIE).partition(".")
+    if not expires.isdigit() or int(expires) < time.time():
+        return False
+    return hmac.compare_digest(signature, sign(expires))
 
 
-UNAUTHORIZED = ("401 Unauthorized",
-                [("WWW-Authenticate", 'Basic realm="admin"'), ("Content-Type", "text/plain"), ("Content-Length", "12")],
-                b"Unauthorized")
+def session_cookie(req, value, max_age):
+    secure = "; Secure" if req.is_https else ""
+    return ("Set-Cookie", f"{SESSION_COOKIE}={value}; Path=/; Max-Age={max_age}; HttpOnly; SameSite=Lax{secure}")
+
+
+def redirect(location, headers=()):
+    return ("302 Found", [("Location", location), ("Content-Length", "0")] + list(headers), b"")
+
+
+UNAUTHORIZED = json_response({"error": "login required"}, "401 Unauthorized")
 
 
 def serve_file(path, cache="no-cache"):
@@ -207,7 +252,9 @@ def handle(req):
         if path == "/api/wishes":
             return json_response(query("SELECT * FROM wishes ORDER BY id DESC"))
         if path in ("/admin", "/admin/", "/admin.html"):
-            return serve_file(os.path.join(ROOT, "admin.html")) if is_admin(req) else UNAUTHORIZED
+            return serve_file(os.path.join(ROOT, "admin.html")) if is_admin(req) else redirect("/login")
+        if path in ("/login", "/login/", "/login.html"):
+            return redirect("/admin") if is_admin(req) else serve_file(os.path.join(ROOT, "login.html"))
         if path == "/api/rsvp":
             return json_response(query("SELECT * FROM rsvp ORDER BY id")) if is_admin(req) else UNAUTHORIZED
         return NOT_FOUND
@@ -215,6 +262,10 @@ def handle(req):
     if method == "POST":
         if path == "/api/upload":
             return upload(req)
+        if path == "/api/login":
+            return login(req)
+        if path == "/api/logout":
+            return json_response({"ok": True}, headers=[session_cookie(req, "", 0)])
         if path not in ("/api/rsvp", "/api/wishes"):
             return NOT_FOUND
         try:
@@ -263,6 +314,19 @@ def handle(req):
 
     return ("405 Method Not Allowed", [("Content-Type", "text/plain"), ("Content-Length", "18")],
             b"Method Not Allowed")
+
+
+def login(req):
+    try:
+        payload = req.json(2_000)
+    except ValueError:
+        return json_response({"error": "bad json"}, "400 Bad Request")
+    ok_login = hmac.compare_digest(str(payload.get("login", "")).strip().encode(), ADMIN_LOGIN.encode())
+    ok_password = hmac.compare_digest(str(payload.get("password", "")).encode(), ADMIN_PASSWORD.encode())
+    if not (ok_login and ok_password):
+        time.sleep(1)  # slow down password guessing
+        return json_response({"error": "Неверный логин или пароль"}, "401 Unauthorized")
+    return json_response({"ok": True}, headers=[session_cookie(req, make_session(), SESSION_DAYS * 86400)])
 
 
 def upload(req):

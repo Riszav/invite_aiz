@@ -107,6 +107,7 @@
       <div class="actions">
         <a class="btn" href="/" target="_blank">Открыть приглашение</a>
         <button class="btn solid" id="csv">Скачать CSV</button>
+        <button class="btn" id="logout">Выйти</button>
       </div>
     </header>
 
@@ -159,6 +160,13 @@
   </div>
 
   <script>
+    // session expired or logged out elsewhere: any 401 from the API sends us to the login page
+    const rawFetch = window.fetch.bind(window);
+    window.fetch = async (...args) => {
+      const res = await rawFetch(...args);
+      if (res.status === 401) { location.replace('/login'); throw new Error('login required'); }
+      return res;
+    };
     // answer values come from the original form: yes / no (= with spouse) / maybe (= can't come)
     const ANSWERS = {
       yes:   { label: 'Придёт',             guests: 1, color: 'var(--yes)' },
@@ -445,6 +453,13 @@
       btn.disabled = false;
     });
     $('ed-reset').addEventListener('click', () => { if (!dirty || confirm('Отменить все несохранённые изменения?')) loadPage(); });
+
+    $('logout').addEventListener('click', async () => {
+      if (dirty && !confirm('Есть несохранённые изменения. Всё равно выйти?')) return;
+      dirty = false;
+      await rawFetch('/api/logout', { method: 'POST' });
+      location.replace('/login');
+    });
 
     load();
     setInterval(load, 15000);

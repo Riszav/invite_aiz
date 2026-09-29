@@ -7,6 +7,7 @@ services:
     ports:
       - "${PORT:-8080}:8080"
     environment:
+      ADMIN_LOGIN: ${ADMIN_LOGIN:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-0601}
     # host folders so the database and uploaded files survive rebuilds
     # and are easy to back up; run as the host user to keep file ownership
