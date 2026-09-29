@@ -6,7 +6,7 @@ Old data/rsvp.json and data/wishes.json are imported once on first start.
 Page content (texts, date, images, music) is stored in the `page` table, seeded from
 data.js, served to the site as /page-data.js and editable from /admin.
 Guest responses are viewable at /admin after signing in on /login
-(ADMIN_LOGIN / ADMIN_PASSWORD, default admin / 0601).
+(login and password are set below: ADMIN_LOGIN / ADMIN_PASSWORD).
 """
 
 import hashlib
@@ -28,8 +28,9 @@ DB_PATH = os.path.join(DATA_DIR, "invite.db")
 UPLOAD_DIR = os.path.join(ROOT, "uploads")
 UPLOAD_TYPES = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".mp3", ".m4a", ".ogg", ".wav"}
 MAX_UPLOAD = 25 * 1024 * 1024
-ADMIN_LOGIN = os.environ.get("ADMIN_LOGIN", "admin")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "0601")
+# admin credentials: change them right here
+ADMIN_LOGIN = "admin"
+ADMIN_PASSWORD = "0601"
 SESSION_COOKIE = "admin_session"
 SESSION_DAYS = 30
 
@@ -179,9 +180,7 @@ NOT_FOUND = ("404 Not Found", [("Content-Type", "text/plain"), ("Content-Length"
 # ---------------- admin session (signed cookie, no server-side state) ----------------
 
 def secret_key():
-    """SECRET_KEY env var, else a random key kept in data/ so sessions survive restarts."""
-    if os.environ.get("SECRET_KEY"):
-        return os.environ["SECRET_KEY"].encode()
+    """Random key kept in data/ so sessions survive restarts."""
     path = os.path.join(DATA_DIR, "secret.key")
     if not os.path.exists(path):
         os.makedirs(DATA_DIR, exist_ok=True)
