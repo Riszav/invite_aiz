@@ -48,6 +48,9 @@
     .wish .meta{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted)}
     .wish .meta b{color:var(--ink)}
     .wish .del{position:absolute;top:8px;right:8px}
+    .page-select{font:inherit;font-size:14px;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:5px 10px;cursor:pointer}
+    .check{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:15px;cursor:pointer}
+    .check input{width:18px;height:18px;accent-color:var(--accent)}
     .views{display:flex;gap:6px;margin-bottom:22px;border-bottom:1px solid var(--line)}
     .view-tab{border:0;background:none;font:inherit;font-size:16px;padding:10px 14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
     .view-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
@@ -102,10 +105,10 @@
     <header>
       <div>
         <h1>Админка</h1>
-        <div class="sub">Кыз узатуу · Айзирек · <span id="updated"></span></div>
+        <div class="sub"><select id="page-select" class="page-select" title="Приглашение"></select> · <span id="updated"></span></div>
       </div>
       <div class="actions">
-        <a class="btn" href="/" target="_blank">Открыть приглашение</a>
+        <a class="btn" href="/" target="_blank" id="open-page">Открыть приглашение</a>
         <button class="btn solid" id="csv">Скачать CSV</button>
         <button class="btn" id="logout">Выйти</button>
       </div>
@@ -174,13 +177,24 @@
       maybe: { label: 'Не сможет прийти',   guests: 0, color: 'var(--no)' }
     };
     let rsvp = [], wishes = [], filter = 'all', query = '';
+    // selected invitation page (remembered in the URL: /admin?page=wedding)
+    let pages = [], slug = new URLSearchParams(location.search).get('page') || 'kyz-uzatuu';
+    const currentPage = () => pages.find(p => p.slug === slug) || { slug, path: '/' };
+    async function loadPages() {
+      pages = await fetch('/api/pages').then(r => r.json());
+      if (!pages.some(p => p.slug === slug)) slug = pages[0].slug;
+      $('page-select').innerHTML = pages.map(p => `<option value="${p.slug}">${esc(p.name)}</option>`).join('');
+      $('page-select').value = slug;
+      $('open-page').href = currentPage().path;
+    }
 
     const $ = id => document.getElementById(id);
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const fmt = iso => new Date(iso).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
     async function load() {
-      const [r, w] = await Promise.all([fetch('/api/rsvp').then(x => x.json()), fetch('/api/wishes').then(x => x.json())]);
+      const q = '?page=' + encodeURIComponent(slug);
+      const [r, w] = await Promise.all([fetch('/api/rsvp' + q).then(x => x.json()), fetch('/api/wishes' + q).then(x => x.json())]);
       rsvp = r.slice().reverse(); wishes = w;
       $('updated').textContent = 'обновлено ' + new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       render();
@@ -245,7 +259,7 @@
     });
 
     // ---------------- site editor ----------------
-    let page = null, dirty = false;
+    let page = null, dirty = false, removedEnvelope = null;
     const comps = () => page.blocks.flatMap(b => b.components);
     const byType = t => comps().filter(c => c.type === t).sort((a, b) => a.position.y - b.position.y);
 
@@ -259,7 +273,7 @@
         try { restoreScroll = frame.contentWindow.scrollY || 0; } catch (e) { restoreScroll = 0; }
         $('phone').classList.add('busy');
         if (frame.src) frame.contentWindow.location.reload();
-        else frame.src = '/?preview=1';
+        else frame.src = currentPage().path + '?preview=1';
       }, immediate ? 0 : 500);
     }
     frame.addEventListener('load', () => {
@@ -281,7 +295,7 @@
     window.addEventListener('beforeunload', e => { if (dirty) e.preventDefault(); });
 
     async function loadPage() {
-      page = await fetch('/api/page').then(r => r.json());
+      page = await fetch('/api/page?page=' + encodeURIComponent(slug)).then(r => r.json());
       renderEditor();
       setDirty(false);
       refreshPreview(true);
@@ -348,24 +362,41 @@
     function renderEditor() {
       const root = $('editor');
       root.innerHTML = '';
-      page.envelope = page.envelope || {};
       const E = page.envelope;
-
+      const envToggle = document.createElement('label');
+      envToggle.className = 'check';
+      envToggle.innerHTML = `<input type="checkbox" ${E ? 'checked' : ''}> Показывать конверт с печатью «АЧУУ» перед приглашением`;
+      envToggle.querySelector('input').addEventListener('change', e => {
+        // turning it back on restores the texts from before it was turned off
+        if (e.target.checked) page.envelope = removedEnvelope || { invitation: 'Чакыруу Билети', title: page.title || '', bottomText: 'Чакырууну ачуу үчүн «АЧУУ» баскычын басыңыз.', button: 'АЧУУ' };
+        else { removedEnvelope = E; page.envelope = null; }
+        renderEditor();
+        setDirty(true);
+      });
       root.append(group('Конверт и заголовок', 'Первый экран, который гость видит до открытия приглашения.', [
         field('Заголовок вкладки браузера', page.title, v => page.title = v),
-        grid([
+        envToggle,
+        E ? grid([
           field('Надпись сверху', E.invitation, v => E.invitation = v),
           field('Название события', E.title, v => E.title = v),
           field('Текст внизу', E.bottomText, v => E.bottomText = v),
           field('Надпись на печати', E.button, v => E.button = v)
-        ])
+        ]) : null
       ]));
 
+      // event date lives in calendar-pro / timer (event_date) and in the month calendar (event_dates[0])
       const dated = comps().filter(c => c.data && c.data.event_date);
+      const monthCals = byType('calendar').filter(c => (c.data.event_dates || [])[0]);
       const timer = byType('timer')[0];
-      if (dated.length) {
+      const currentDate = dated.length ? dated[0].data.event_date
+        : monthCals.length ? `${monthCals[0].data.event_dates[0].date}T${monthCals[0].data.event_dates[0].time || '00:00'}` : '';
+      const setDate = v => {
+        dated.forEach(c => c.data.event_date = v + ':00');
+        monthCals.forEach(c => { c.data.event_dates[0].date = v.slice(0, 10); c.data.event_dates[0].time = v.slice(11, 16); });
+      };
+      if (dated.length || monthCals.length) {
         root.append(group('Дата и время события', 'Меняет календарь и таймер обратного отсчёта одновременно.', [
-          field('Дата и время', toLocalInput(dated[0].data.event_date), v => dated.forEach(c => c.data.event_date = v + ':00'), { type: 'datetime-local', target: dated[0].id }),
+          field('Дата и время', toLocalInput(currentDate), setDate, { type: 'datetime-local', target: (monthCals[0] || dated[0]).id }),
           timer ? field('Заголовок таймера', timer.data.event_title, v => timer.data.event_title = v, { target: timer.id }) : null
         ]));
       }
@@ -443,7 +474,7 @@
       const btn = $('ed-save');
       btn.disabled = true;
       try {
-        const res = await fetch('/api/page', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(page) });
+        const res = await fetch('/api/page?page=' + encodeURIComponent(slug), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(page) });
         if (!res.ok) throw new Error(res.status);
         setDirty(false);
         $('ed-status').textContent = 'Сохранено ✓ — обновите страницу приглашения';
@@ -461,7 +492,17 @@
       location.replace('/login');
     });
 
-    load();
+    $('page-select').addEventListener('change', async e => {
+      if (dirty && !confirm('Есть несохранённые изменения. Переключиться без сохранения?')) { e.target.value = slug; return; }
+      slug = e.target.value;
+      history.replaceState(null, '', '/admin?page=' + slug);
+      $('open-page').href = currentPage().path;
+      filter = 'all';
+      load();
+      if (page) { frame.removeAttribute('src'); loadPage(); }
+    });
+
+    loadPages().then(load);
     setInterval(load, 15000);
   </script>
 </body>

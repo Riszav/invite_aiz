@@ -4,6 +4,8 @@
 @font-face{font-family:"KZGoodVibes";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/KZGoodVibes.woff2)format("woff2");font-display:swap}
 @font-face{font-family:"_AsylbekM02Shelley";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/_AsylbekM02Shelley.kz_.woff2)format("woff2");font-display:swap}
 @font-face{font-family:"KZ_RomulC";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/KZ_RomulC.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"KZ-Ceremonious-One";src:url("https://www.chakyruu24.kg/fonts/kz_fon_1/KZ_ceremonious-one (2).ttf")format("truetype");font-display:swap}
+@font-face{font-family:"KZPFMonumentaPro-Regular";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/KZPFMonumentaPro-Regular.woff2)format("woff2");font-display:swap}
 @font-face{font-family:"KZOptima";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/KZOptima.woff2)format("woff2");font-display:swap}
 
 *{box-sizing:border-box}
@@ -27,7 +29,7 @@ body.locked{overflow:hidden}
 .sh-component__content{width:100%;height:100%}
 
 .text-content{width:100%;height:100%;min-height:20px;padding:4px;word-break:break-word;white-space:pre-wrap;margin:0;display:flex;align-items:center;justify-content:center}
-.sh-component[data-type="text"]{overflow:visible}
+.sh-component[data-type="text"],.sh-component[data-type="calendar"]{overflow:visible}
 .img-wrap{width:100%;height:100%;overflow:hidden;position:relative}
 .img-wrap img{width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none}
 .shape{width:100%;height:100%;position:relative}
@@ -64,6 +66,27 @@ body.locked{overflow:hidden}
 .cal-week{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
 .cal-week div{letter-spacing:6px;text-align:center;padding:4px 15px}
 .cal-week div.active{font-size:20px;padding:8px 30px;border:2px solid currentColor;border-radius:8px}
+
+/* ---------- month calendar ---------- */
+.mcal{width:100%;-webkit-font-smoothing:antialiased}
+.mcal-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px;padding:0 4px;font-size:24px;text-transform:uppercase;letter-spacing:.08em;line-height:1}
+.mcal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.mcal-week{gap:4px;margin-bottom:10px}
+.mcal-week div{font-weight:500;text-transform:uppercase;letter-spacing:.05em;text-align:center;padding:6px 4px}
+.mcal-days{gap:2px}
+.mcal-days > div{text-align:center;padding:14px 4px;position:relative;min-height:48px;display:flex;align-items:center;justify-content:center}
+.mcal-days span{position:relative;z-index:1}
+.mcal-heart{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);line-height:0;z-index:0;animation:mcalBeat 6s ease-in-out infinite}
+.mcal-heart svg{display:block;overflow:visible}
+.mcal-heart path{stroke-dasharray:1;stroke-dashoffset:1;animation:mcalDraw 6s ease-in-out infinite}
+.mcal-heart path:nth-child(2){animation-delay:.2s}
+.mcal-heart path:nth-child(3){animation-delay:.4s}
+@keyframes mcalDraw{0%{stroke-dashoffset:1}30%,85%{stroke-dashoffset:0}100%{stroke-dashoffset:1}}
+@keyframes mcalBeat{0%,30%,100%{transform:translate(-50%,-50%) scale(1)}40%{transform:translate(-50%,-50%) scale(1.1)}50%{transform:translate(-50%,-50%) scale(1)}}
+.mcal-bar{margin-top:24px;padding:20px;border-radius:14px;border-left:4px solid;display:flex;justify-content:space-between;align-items:center;gap:12px;letter-spacing:.03em;font-weight:600}
+.mcal-bar div:first-child{font-size:18px}
+.mcal-bar div:last-child{font-size:22px;white-space:nowrap}
+.preview .mcal-heart,.preview .mcal-heart path{animation:none;stroke-dashoffset:0}
 
 /* ---------- timer ---------- */
 .timer{padding:20px;text-align:center;min-height:120px;display:flex;flex-direction:column;justify-content:center}

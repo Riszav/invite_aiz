@@ -3,8 +3,9 @@
 Works on any WSGI host (PythonAnywhere, gunicorn, ...) and locally via server.py.
 Answers and wishes are stored in SQLite: data/invite.db (tables rsvp, wishes).
 Old data/rsvp.json and data/wishes.json are imported once on first start.
-Page content (texts, date, images, music) is stored in the `page` table, seeded from
-data.js, served to the site as /page-data.js and editable from /admin.
+The site has several invitation pages (see PAGES). Each page's content (texts, date, images,
+music) is stored in the `pages` table, seeded from its data file, served to the site as
+/page-data.js?page=<slug> and editable from /admin. Answers and wishes are kept per page.
 Guest responses are viewable at /admin after signing in on /login
 (login and password are set below: ADMIN_LOGIN / ADMIN_PASSWORD).
 """
@@ -35,7 +36,15 @@ SESSION_COOKIE = "admin_session"
 SESSION_DAYS = 30
 
 # files of the site itself that may be served; everything else except uploads/ is private
-PUBLIC_FILES = {"index.html", "app.js", "style.css"}
+PUBLIC_FILES = {"app.js", "style.css"}
+
+# invitation pages: slug -> URL path, seed data file, name shown in the admin
+PAGES = {
+    "kyz-uzatuu": {"path": "/", "seed": "data.js", "name": "Кыз узатуу · Айзирек"},
+    "wedding": {"path": "/wedding", "seed": "data_wedding.js", "name": "Үйлөнүү той · Руслан & Айзирек"},
+}
+DEFAULT_PAGE = "kyz-uzatuu"
+PAGE_BY_PATH = {v["path"]: k for k, v in PAGES.items()}
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS rsvp (
@@ -51,8 +60,8 @@ CREATE TABLE IF NOT EXISTS wishes (
     text        TEXT NOT NULL,
     created_at  TEXT NOT NULL
 );
-CREATE TABLE IF NOT EXISTS page (
-    id          INTEGER PRIMARY KEY CHECK (id = 1),
+CREATE TABLE IF NOT EXISTS pages (
+    slug        TEXT PRIMARY KEY,
     data        TEXT NOT NULL,
     updated_at  TEXT NOT NULL
 );
@@ -88,8 +97,14 @@ def now_iso():
     return datetime.now(timezone.utc).isoformat()
 
 
-def get_page():
-    return json.loads(query("SELECT data FROM page WHERE id = 1")[0]["data"])
+def get_page(slug):
+    return json.loads(query("SELECT data FROM pages WHERE slug = ?", (slug,))[0]["data"])
+
+
+def read_seed(filename):
+    with open(os.path.join(ROOT, filename), encoding="utf-8") as f:
+        raw = re.sub(r"^\s*window\.PAGE_DATA\s*=\s*", "", f.read()).strip().rstrip(";")
+    return json.dumps(json.loads(raw), ensure_ascii=False)
 
 
 def init_db():
@@ -113,14 +128,28 @@ def init_db():
                 )
             os.rename(path, path + ".imported")
             print(f"Imported {len(items)} rows from {table}.json")
-        # seed page content from data.js
-        if not conn.execute("SELECT 1 FROM page WHERE id = 1").fetchone():
-            with open(os.path.join(ROOT, "data.js"), encoding="utf-8") as f:
-                raw = re.sub(r"^\s*window\.PAGE_DATA\s*=\s*", "", f.read()).strip().rstrip(";")
+        # answers and wishes belong to a page (older rows -> the first page)
+        for table in ("rsvp", "wishes"):
+            cols = [r[1] for r in conn.execute(f"PRAGMA table_info({table})")]
+            if "page" not in cols:
+                with conn:
+                    conn.execute(f"ALTER TABLE {table} ADD COLUMN page TEXT NOT NULL DEFAULT '{DEFAULT_PAGE}'")
+        # content edited before multi-page support lived in the single-row `page` table
+        old = conn.execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'page'").fetchone()
+        if old:
+            row = conn.execute("SELECT data, updated_at FROM page WHERE id = 1").fetchone()
             with conn:
-                conn.execute("INSERT INTO page (id, data, updated_at) VALUES (1, ?, ?)",
-                             (json.dumps(json.loads(raw), ensure_ascii=False), now_iso()))
-            print("Seeded page content from data.js")
+                if row:
+                    conn.execute("INSERT OR IGNORE INTO pages (slug, data, updated_at) VALUES (?, ?, ?)",
+                                 (DEFAULT_PAGE, row["data"], row["updated_at"]))
+                conn.execute("DROP TABLE page")
+        # seed every page that is not in the database yet
+        for slug, cfg in PAGES.items():
+            if not conn.execute("SELECT 1 FROM pages WHERE slug = ?", (slug,)).fetchone():
+                with conn:
+                    conn.execute("INSERT INTO pages (slug, data, updated_at) VALUES (?, ?, ?)",
+                                 (slug, read_seed(cfg["seed"]), now_iso()))
+                print(f"Seeded page {slug} from {cfg['seed']}")
     finally:
         conn.close()
 
@@ -232,30 +261,64 @@ def serve_file(path, cache="no-cache"):
 
 # ---------------- routes ----------------
 
+def page_slug(req, payload=None):
+    slug = (payload or {}).get("page") or req.query.get("page", [DEFAULT_PAGE])[0]
+    return slug if slug in PAGES else None
+
+
+def serve_invitation(slug):
+    """index.html with the page's data script and title filled in."""
+    with open(os.path.join(ROOT, "index.html"), encoding="utf-8") as f:
+        html = f.read()
+    title = get_page(slug).get("title") or PAGES[slug]["name"]
+    safe = title.replace("&", "&amp;").replace("<", "&lt;").replace('"', "&quot;")
+    html = html.replace('<script src="/page-data.js"></script>',
+                        f'<script>window.PAGE_SLUG = "{slug}";</script>\n  '
+                        f'<script src="/page-data.js?page={slug}"></script>')
+    html = re.sub(r"<title>.*?</title>", f"<title>{safe}</title>", html, count=1)
+    html = re.sub(r'(<meta (?:property="og:title"|name="description"|property="og:description") content=")[^"]*"',
+                  lambda m: m.group(1) + safe + '"', html)
+    return response("200 OK", html, "text/html; charset=utf-8", [("Cache-Control", "no-cache")])
+
+
 def handle(req):
     path, method = req.path, req.method
 
     if method == "GET":
-        if path in ("/", "/index.html"):
-            return serve_file(os.path.join(ROOT, "index.html"))
+        if path == "/index.html":
+            path = "/"
+        if path.rstrip("/") in PAGE_BY_PATH or path in PAGE_BY_PATH:
+            return serve_invitation(PAGE_BY_PATH.get(path) or PAGE_BY_PATH[path.rstrip("/")])
         if path.lstrip("/") in PUBLIC_FILES:
             return serve_file(os.path.join(ROOT, path.lstrip("/")))
         if path.startswith("/uploads/"):
             name = os.path.basename(path)  # no subdirectories, no traversal
             return serve_file(os.path.join(UPLOAD_DIR, name), "public, max-age=31536000")
         if path == "/page-data.js":
-            body = "window.PAGE_DATA = " + json.dumps(get_page(), ensure_ascii=False) + ";\n"
+            slug = page_slug(req)
+            if not slug:
+                return NOT_FOUND
+            body = "window.PAGE_DATA = " + json.dumps(get_page(slug), ensure_ascii=False) + ";\n"
             return response("200 OK", body, "application/javascript; charset=utf-8", [("Cache-Control", "no-cache")])
         if path == "/api/page":
-            return json_response(get_page())
+            slug = page_slug(req)
+            return json_response(get_page(slug)) if slug else NOT_FOUND
+        if path == "/api/pages":
+            return json_response([{"slug": k, "path": v["path"], "name": v["name"]} for k, v in PAGES.items()])
         if path == "/api/wishes":
-            return json_response(query("SELECT * FROM wishes ORDER BY id DESC"))
+            slug = page_slug(req)
+            if not slug:
+                return NOT_FOUND
+            return json_response(query("SELECT * FROM wishes WHERE page = ? ORDER BY id DESC", (slug,)))
         if path in ("/admin", "/admin/", "/admin.html"):
             return serve_file(os.path.join(ROOT, "admin.html")) if is_admin(req) else redirect("/login")
         if path in ("/login", "/login/", "/login.html"):
             return redirect("/admin") if is_admin(req) else serve_file(os.path.join(ROOT, "login.html"))
         if path == "/api/rsvp":
-            return json_response(query("SELECT * FROM rsvp ORDER BY id")) if is_admin(req) else UNAUTHORIZED
+            if not is_admin(req):
+                return UNAUTHORIZED
+            slug = page_slug(req)
+            return json_response(query("SELECT * FROM rsvp WHERE page = ? ORDER BY id", (slug,))) if slug else NOT_FOUND
         return NOT_FOUND
 
     if method == "POST":
@@ -271,30 +334,36 @@ def handle(req):
             payload = req.json(20_000)
         except ValueError:
             return json_response({"error": "bad json"}, "400 Bad Request")
+        if not isinstance(payload, dict) or not page_slug(req, payload):
+            return json_response({"error": "unknown page"}, "400 Bad Request")
+        slug = page_slug(req, payload)
         name = str(payload.get("name", "")).strip()[:80]
         if path == "/api/rsvp":
             if not name:
                 return json_response({"error": "name required"}, "400 Bad Request")
-            execute("INSERT INTO rsvp (name, answer, answer_text, created_at) VALUES (?, ?, ?, ?)",
-                    (name, str(payload.get("answer", ""))[:20], str(payload.get("answer_text", ""))[:80], now_iso()))
+            execute("INSERT INTO rsvp (page, name, answer, answer_text, created_at) VALUES (?, ?, ?, ?, ?)",
+                    (slug, name, str(payload.get("answer", ""))[:20], str(payload.get("answer_text", ""))[:80], now_iso()))
             return json_response({"ok": True})
         text = str(payload.get("text", "")).strip()[:1000]
         if not name or not text:
             return json_response({"error": "name and text required"}, "400 Bad Request")
-        execute("INSERT INTO wishes (name, text, created_at) VALUES (?, ?, ?)", (name, text, now_iso()))
+        execute("INSERT INTO wishes (page, name, text, created_at) VALUES (?, ?, ?, ?)", (slug, name, text, now_iso()))
         return json_response({"ok": True})
 
     if method == "PUT" and path == "/api/page":
         if not is_admin(req):
             return UNAUTHORIZED
+        slug = page_slug(req)
+        if not slug:
+            return NOT_FOUND
         try:
             data = req.json(2_000_000)
             if not isinstance(data, dict) or not isinstance(data.get("blocks"), list):
                 raise ValueError
         except ValueError:
             return json_response({"error": "bad page data"}, "400 Bad Request")
-        execute("UPDATE page SET data = ?, updated_at = ? WHERE id = 1",
-                (json.dumps(data, ensure_ascii=False), now_iso()))
+        execute("UPDATE pages SET data = ?, updated_at = ? WHERE slug = ?",
+                (json.dumps(data, ensure_ascii=False), now_iso(), slug))
         return json_response({"ok": True})
 
     if method == "DELETE":

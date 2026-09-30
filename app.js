@@ -8,6 +8,8 @@
   const MONTHS = ['ЯНВАРЬ', 'ФЕВРАЛЬ', 'МАРТ', 'АПРЕЛЬ', 'МАЙ', 'ИЮНЬ', 'ИЮЛЬ', 'АВГУСТ', 'СЕНТЯБРЬ', 'ОКТЯБРЬ', 'НОЯБРЬ', 'ДЕКАБРЬ'];
   const WEEKDAYS = ['ЖЕКШЕМБИ', 'ДҮЙШӨМБҮ', 'ШЕЙШЕМБИ', 'ШАРШЕМБИ', 'БЕЙШЕМБИ', 'ЖУМА', 'ИШЕМБИ'];
   const TZ_OFFSET = { 'Asia/Almaty': '+05:00', 'Asia/Bishkek': '+06:00' };
+  const PAGE_SLUG = window.PAGE_SLUG || 'kyz-uzatuu';
+  const CAL_WEEKDAYS = ['Дш', 'Шш', 'Шр', 'Бш', 'Жм', 'Иш', 'Жк'];
 
   const el = (tag, props = {}, children = []) => {
     const n = document.createElement(tag);
@@ -56,9 +58,36 @@
     }
   }, c.data.content);
 
+  // jagged "torn paper" edge on top and/or bottom of a photo, drawn as an SVG mask.
+  // Deterministic per seed so the edge looks the same on every visit.
+  function tornMask(w, h, edge) {
+    let seed = (edge.seed || 1) * 9301 + (edge.variant || '').length * 49297;
+    const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+    const depth = edge.height || 35;
+    const coarse = edge.variant === 'torn1';  // big mountain-like peaks vs finer rip
+    const step = coarse ? 14 : 7;
+    const line = (y0, dir) => {
+      const pts = [];
+      for (let x = 0; x <= w + step; x += step) {
+        const big = coarse && rnd() < 0.18 ? rnd() * depth : 0;
+        const d = Math.min(depth, rnd() * depth * 0.55 + big);
+        pts.push(`${Math.min(x, w).toFixed(1)},${(y0 + dir * d).toFixed(1)}`);
+      }
+      return pts;
+    };
+    const top = edge.top ? line(0, 1) : [`0,0`, `${w},0`];
+    const bottom = edge.bottom ? line(h, -1).reverse() : [`${w},${h}`, `0,${h}`];
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polygon fill="#000" points="${top.join(' ')} ${bottom.join(' ')}"/></svg>`;
+    return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+  }
+
   R.image = c => {
     const s = c.style;
-    return el('div', { class: 'img-wrap', style: { borderRadius: s.borderRadius || '0px' } },
+    const torn = c.data.tornEdge && (c.data.tornEdge.top || c.data.tornEdge.bottom)
+      ? tornMask(c.size.width, c.size.height, c.data.tornEdge) : null;
+    const wrapStyle = { borderRadius: s.borderRadius || '0px' };
+    if (torn) Object.assign(wrapStyle, { maskImage: torn, webkitMaskImage: torn, maskSize: '100% 100%', webkitMaskSize: '100% 100%' });
+    return el('div', { class: 'img-wrap', style: wrapStyle },
       el('img', {
         src: c.data.src, alt: c.data.alt || '', loading: 'lazy', draggable: 'false',
         style: {
@@ -90,6 +119,47 @@
     }, d.text);
     a.insertAdjacentHTML('beforeend', '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>');
     return a;
+  };
+
+  // month grid with a hand-drawn heart on the event day and a start-time bar
+  R.calendar = c => {
+    const d = c.data;
+    const ev = (d.event_dates || [])[0] || {};
+    const [y, m, day] = (ev.date || '').split('-').map(Number);
+    if (!y) return null;
+    const font = `${d.daysFontFamily || d.titleFontFamily}, Georgia, serif`;
+    const marker = d.eventMarkerColor || '#ba4545';
+    const head = el('div', { class: 'mcal-head', style: { color: d.titleColor } }, [
+      el('span', { style: { fontWeight: 600 } }, MONTHS[m - 1]), el('span', { style: { fontWeight: 500 } }, String(y))
+    ]);
+    const week = el('div', { class: 'mcal-grid mcal-week' }, CAL_WEEKDAYS.map(w =>
+      el('div', { style: { fontSize: d.weekdaysFontSize + 'px', color: d.weekdaysColor } }, w)));
+    const days = el('div', { class: 'mcal-grid mcal-days' });
+    const lead = (new Date(y, m - 1, 1).getDay() + 6) % 7;  // Monday first
+    const total = new Date(y, m, 0).getDate();
+    for (let i = 0; i < lead; i++) days.append(el('div'));
+    for (let n = 1; n <= total; n++) {
+      const cell = el('div', { style: { fontSize: d.daysFontSize + 'px', color: d.daysColor } });
+      if (n === day) {
+        const size = Math.round((d.eventMarkerSize || 40) * 1.55);
+        const wrap = el('div', { class: 'mcal-heart' });
+        wrap.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 100 100" fill="none" stroke="${marker}" stroke-linecap="round" stroke-linejoin="round">
+          <path pathLength="1" stroke-width="3" d="M50 88 C40 80 8 62 8 35 C8 18 20 9 33 11 C42 12 47 19 50 27 C53 19 58 12 67 11 C80 9 92 18 92 35 C92 62 60 80 50 88 Z"/>
+          <path pathLength="1" stroke-width="1.6" opacity=".6" d="M47 83 C30 72 13 57 13 37 C13 25 21 16 32 16"/>
+          <path pathLength="1" stroke-width="1.6" opacity=".6" d="M56 80 C70 71 86 57 87 38"/></svg>`;
+        cell.append(wrap, el('span', { style: { fontWeight: 600 } }, String(n)));
+      } else {
+        cell.append(el('span', {}, String(n)));
+      }
+      days.append(cell);
+    }
+    const bar = el('div', { class: 'mcal-bar', style: { background: marker + '14', borderLeftColor: marker } }, [
+      el('div', { style: { color: d.titleColor } }, 'Башталышы'),
+      el('div', { style: { color: marker } }, ev.time || '')
+    ]);
+    return el('div', {
+      class: 'mcal', style: { fontFamily: font, background: d.backgroundColor, borderRadius: d.borderRadius + 'px', padding: (d.padding ?? 20) + 'px' }
+    }, [head, week, days, ev.time ? bar : null]);
   };
 
   R['calendar-pro'] = c => {
@@ -169,7 +239,7 @@
         send.disabled = true;
         try {
           const label = d.form_buttons.find(b => b.button_value === choice).button_text;
-          await api('/api/rsvp', { form_id: d.form_id, name, answer: choice, answer_text: label });
+          await api('/api/rsvp', { page: PAGE_SLUG, form_id: d.form_id, name, answer: choice, answer_text: label });
           box.replaceChildren(el('div', { class: 'modal-msg' }, 'Рахмат! Жообуңуз кабыл алынды.'));
           setTimeout(closeModal, 1800);
         } catch (e) {
@@ -243,7 +313,7 @@
 
   async function loadWishes() {
     try {
-      const wishes = await api('/api/wishes');
+      const wishes = await api('/api/wishes?page=' + encodeURIComponent(PAGE_SLUG));
       wishLists.forEach(ctx => renderWishes(ctx, wishes));
     } catch (e) { /* static hosting without API: keep empty state */ }
   }
@@ -296,7 +366,7 @@
       if (!text.value.trim()) return text.focus();
       send.disabled = true;
       try {
-        await api('/api/wishes', { name: name.value.trim(), text: text.value.trim() });
+        await api('/api/wishes', { page: PAGE_SLUG, name: name.value.trim(), text: text.value.trim() });
         box.replaceChildren(el('div', { class: 'modal-msg' }, 'Рахмат! Каалооңуз жөнөтүлдү.'));
         loadWishes();
         setTimeout(closeModal, 1800);
@@ -325,7 +395,9 @@
     const block = el('div', {
       class: 'sh-block', style: {
         background: s.backgroundColor, height: s.height, minHeight: s.minHeight,
-        backgroundImage: s.backgroundImage ? `url(${s.backgroundImage})` : ''
+        backgroundImage: s.backgroundImage ? `url("${s.backgroundImage}")` : '',
+        backgroundSize: s.backgroundSize || '', backgroundPosition: s.backgroundPosition || '',
+        backgroundRepeat: s.backgroundRepeat || '', backgroundAttachment: s.backgroundAttachment || ''
       }
     });
     b.components.forEach(c => {
@@ -386,6 +458,12 @@
       void node.offsetWidth;
       node.classList.add('preview-flash');
     };
+    return;
+  }
+  if (!DATA.envelope) {
+    env.classList.add('gone');
+    document.getElementById('fixed-bar').classList.add('show');
+    startAnimations();
     return;
   }
   document.body.classList.add('locked');
