@@ -1,6 +1,6 @@
 window.PAGE_DATA = {
     "title": "Үйлөнүү той · Руслан & Айзирек",
-    "ogImage": "https://aisoft09.shop/uploads/cover_invite.jpg",
+    "ogImage": "https://shaqyru24api.com/uploads/cover_invite.jpg",
     "blocks": [
         {
             "id": "adcacead-17a9-48a7-859f-1724ff97a9e1",
@@ -8,7 +8,7 @@ window.PAGE_DATA = {
             "position": 0,
             "style": {
                 "backgroundColor": "#FFFFFF",
-                "backgroundImage": "https://aisoft09.shop/uploads/beyne/page_builder_block_background_6d88e83632414d29a02ed1b9e978b1ce.webp",
+                "backgroundImage": "https://shaqyru24api.com/uploads/beyne/page_builder_block_background_6d88e83632414d29a02ed1b9e978b1ce.webp",
                 "minHeight": "500px",
                 "height": "5100px",
                 "margin": "0px",
@@ -73,7 +73,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1778101388625_dba2efe0ee7544c6bf3551a4ebb42d62.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1778101388625_dba2efe0ee7544c6bf3551a4ebb42d62.webp",
                         "alt": "ChatGPT Image 7 мая 2026 г., 02_02_03 (1).png",
                         "cropMode": "square",
                         "isPhoto": false,
@@ -189,7 +189,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1770662182109_dfa09a85de8345d695511209d9c1ad29.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1770662182109_dfa09a85de8345d695511209d9c1ad29.webp",
                         "alt": "Gemini_Generated_Image_xyxtskxyxtskxyxt-Photoroom.png",
                         "cropMode": "original",
                         "isPhoto": false,
@@ -219,7 +219,7 @@ window.PAGE_DATA = {
                         "transform": "rotate(0deg)"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1770662352135_ae1e7fb336074cb49f3fec123a5dd6ea.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1770662352135_ae1e7fb336074cb49f3fec123a5dd6ea.webp",
                         "alt": "44db1e2492de3a141af4cb3eb5ac786f-Photoroom.png",
                         "cropMode": "original",
                         "isPhoto": false,
@@ -303,7 +303,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1770662182109_dfa09a85de8345d695511209d9c1ad29.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1770662182109_dfa09a85de8345d695511209d9c1ad29.webp",
                         "alt": "Gemini_Generated_Image_xyxtskxyxtskxyxt-Photoroom.png",
                         "cropMode": "original",
                         "isPhoto": false,
@@ -332,7 +332,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1778102627133_c1190a4f6f1c421b97ba989853bb3da3.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1778102627133_c1190a4f6f1c421b97ba989853bb3da3.webp",
                         "alt": "ChatGPT Image 7 мая 2026 г., 02_22_54 (1).png",
                         "cropMode": "original",
                         "isPhoto": false,
@@ -364,7 +364,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1770662182109_dfa09a85de8345d695511209d9c1ad29.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1770662182109_dfa09a85de8345d695511209d9c1ad29.webp",
                         "alt": "Gemini_Generated_Image_xyxtskxyxtskxyxt-Photoroom.png",
                         "cropMode": "original",
                         "isPhoto": false,
@@ -519,7 +519,7 @@ window.PAGE_DATA = {
                     },
                     "style": {},
                     "data": {
-                        "audio_url": "https://aisoft09.shop/uploads/beyne/audio/audio_48f58c2c81e2.mp3",
+                        "audio_url": "https://shaqyru24api.com/uploads/beyne/audio/audio_48f58c2c81e2.mp3",
                         "button_text": "Музыка",
                         "button_color": "#8d0c0c",
                         "text_color": "#ffffff",
@@ -643,7 +643,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1776791557186_faefe3162ffc4e9683f10003145882d6.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1776791557186_faefe3162ffc4e9683f10003145882d6.webp",
                         "alt": "__33.png.webp",
                         "cropMode": "original",
                         "isPhoto": false,
@@ -672,7 +672,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1776791557186_faefe3162ffc4e9683f10003145882d6.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1776791557186_faefe3162ffc4e9683f10003145882d6.webp",
                         "alt": "__33.png.webp",
                         "cropMode": "original",
                         "isPhoto": false,
@@ -701,7 +701,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1776792531033_6b0f60f854b24c7eae30c4044bfcba32.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1776792531033_6b0f60f854b24c7eae30c4044bfcba32.webp",
                         "alt": "10.png.webp",
                         "cropMode": "original",
                         "isPhoto": false,
@@ -725,7 +725,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1776792778245_aad814482cb445828b6e07516fdfb241.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1776792778245_aad814482cb445828b6e07516fdfb241.webp",
                         "alt": "9.png.webp",
                         "cropMode": "original",
                         "isPhoto": false,
@@ -754,7 +754,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1778102217069_df815243fd3b47668774586a12456182.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1778102217069_df815243fd3b47668774586a12456182.webp",
                         "alt": "ChatGPT Image 7 мая 2026 г., 02_16_30 (1).png",
                         "cropMode": "original",
                         "isPhoto": false,
@@ -903,7 +903,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1776791557186_faefe3162ffc4e9683f10003145882d6.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1776791557186_faefe3162ffc4e9683f10003145882d6.webp",
                         "alt": "__33.png.webp",
                         "cropMode": "original",
                         "isPhoto": false,
@@ -932,7 +932,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1776791557186_faefe3162ffc4e9683f10003145882d6.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1776791557186_faefe3162ffc4e9683f10003145882d6.webp",
                         "alt": "__33.png.webp",
                         "cropMode": "original",
                         "isPhoto": false,
@@ -1021,7 +1021,7 @@ window.PAGE_DATA = {
                         "objectFit": "cover"
                     },
                     "data": {
-                        "src": "https://aisoft09.shop/uploads/beyne/page_builder_comp_1776792778245_aad814482cb445828b6e07516fdfb241.webp",
+                        "src": "https://shaqyru24api.com/uploads/beyne/page_builder_comp_1776792778245_aad814482cb445828b6e07516fdfb241.webp",
                         "alt": "9.png.webp",
                         "cropMode": "original",
                         "isPhoto": false,

@@ -44,6 +44,9 @@ PAGES = {
     "wedding": {"path": "/wedding", "seed": "data_wedding.js", "name": "Үйлөнүү той · Руслан & Айзирек"},
 }
 DEFAULT_PAGE = "kyz-uzatuu"
+
+# the original builder moved its media (photos, music) to another host; old links are rewritten on start
+MEDIA_HOST_MOVES = {"https://aisoft09.shop/": "https://shaqyru24api.com/"}
 PAGE_BY_PATH = {v["path"]: k for k, v in PAGES.items()}
 
 SCHEMA = """
@@ -143,6 +146,15 @@ def init_db():
                     conn.execute("INSERT OR IGNORE INTO pages (slug, data, updated_at) VALUES (?, ?, ?)",
                                  (DEFAULT_PAGE, row["data"], row["updated_at"]))
                 conn.execute("DROP TABLE page")
+        # rewrite media links whose host has moved
+        for slug, data in conn.execute("SELECT slug, data FROM pages").fetchall():
+            fixed = data
+            for old, new in MEDIA_HOST_MOVES.items():
+                fixed = fixed.replace(old, new)
+            if fixed != data:
+                with conn:
+                    conn.execute("UPDATE pages SET data = ? WHERE slug = ?", (fixed, slug))
+                print(f"Updated media links of page {slug}")
         # seed every page that is not in the database yet
         for slug, cfg in PAGES.items():
             if not conn.execute("SELECT 1 FROM pages WHERE slug = ?", (slug,)).fetchone():

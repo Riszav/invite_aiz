@@ -1,12 +1,12 @@
 /* Fonts are served (with CORS) by the original builder's CDN */
-@font-face{font-family:"TildaSans-Light";src:url(https://www.chakyruu24.kg/fonts/tilda/TildaSans-Light.woff2)format("woff2");font-display:swap}
-@font-face{font-family:"TildaSans-Regular";src:url(https://www.chakyruu24.kg/fonts/tilda/TildaSans-Regular.woff2)format("woff2");font-display:swap}
-@font-face{font-family:"KZGoodVibes";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/KZGoodVibes.woff2)format("woff2");font-display:swap}
-@font-face{font-family:"_AsylbekM02Shelley";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/_AsylbekM02Shelley.kz_.woff2)format("woff2");font-display:swap}
-@font-face{font-family:"KZ_RomulC";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/KZ_RomulC.woff2)format("woff2");font-display:swap}
-@font-face{font-family:"KZ-Ceremonious-One";src:url("https://www.chakyruu24.kg/fonts/kz_fon_1/KZ_ceremonious-one (2).ttf")format("truetype");font-display:swap}
-@font-face{font-family:"KZPFMonumentaPro-Regular";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/KZPFMonumentaPro-Regular.woff2)format("woff2");font-display:swap}
-@font-face{font-family:"KZOptima";src:url(https://www.chakyruu24.kg/fonts/kz_fon_1/KZOptima.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"TildaSans-Light";src:url(https://chakyruu24.kg/fonts/tilda/TildaSans-Light.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"TildaSans-Regular";src:url(https://chakyruu24.kg/fonts/tilda/TildaSans-Regular.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"KZGoodVibes";src:url(https://chakyruu24.kg/fonts/kz_fon_1/KZGoodVibes.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"_AsylbekM02Shelley";src:url(https://chakyruu24.kg/fonts/kz_fon_1/_AsylbekM02Shelley.kz_.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"KZ_RomulC";src:url(https://chakyruu24.kg/fonts/kz_fon_1/KZ_RomulC.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"KZ-Ceremonious-One";src:url("https://chakyruu24.kg/fonts/kz_fon_1/KZ_ceremonious-one (2).ttf")format("truetype");font-display:swap}
+@font-face{font-family:"KZPFMonumentaPro-Regular";src:url(https://chakyruu24.kg/fonts/kz_fon_1/KZPFMonumentaPro-Regular.woff2)format("woff2");font-display:swap}
+@font-face{font-family:"KZOptima";src:url(https://chakyruu24.kg/fonts/kz_fon_1/KZOptima.woff2)format("woff2");font-display:swap}
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
